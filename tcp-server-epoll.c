@@ -28,16 +28,14 @@ static void handle_client_event( int client_fd, uint32_t revents, _socket_info *
 
 ///////////////////////////////////////////////////////////////////////////////////////
 static int epoll_add(int epoll_fd, int fd, uint32_t events){
-    int err;
     struct epoll_event event;
-
+    
     /* Shut the valgrind up! */
     memset(&event, 0, sizeof(struct epoll_event));
 
     event.events  = events;
     event.data.fd = fd;
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event) < 0) {
-        err = errno;
         return -1;
     }
     return 0;
@@ -45,10 +43,7 @@ static int epoll_add(int epoll_fd, int fd, uint32_t events){
 ///////////////////////////////////////////////////////////////////////////////////////
 static int epoll_delete(int epoll_fd, int fd)
 {
-    int err;
-
     if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL) < 0) {
-        err = errno;
         return -1;
     }
     return 0;
@@ -264,7 +259,6 @@ out:
 ///////////////////////////////////////////////////////////////////////////////////////
 int epoll_init_socket(_socket_info *si){
     int ret;
-    int err;
     int tcp_fd = -1;
     struct sockaddr_in addr;
     socklen_t addr_len = sizeof(addr);
@@ -286,7 +280,6 @@ int epoll_init_socket(_socket_info *si){
     /* The epoll_create argument is ignored on modern Linux */
     epoll_fd = epoll_create(255);
     if (epoll_fd < 0) {
-        err = errno;
         return ERR_EPOLL_CREATE;
     }
 
@@ -295,7 +288,6 @@ int epoll_init_socket(_socket_info *si){
 
     tcp_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, IPPROTO_TCP);
     if (tcp_fd < 0) {
-        err = errno;
         return ERR_SOCKET_CREATE;
     }
 
@@ -307,14 +299,12 @@ int epoll_init_socket(_socket_info *si){
     ret = bind(tcp_fd, (struct sockaddr *)&addr, addr_len);
     if (ret < 0) {
         ret = ERR_SOCKET_BIND;
-        err = errno;
         goto out;
     }
 
     ret = listen(tcp_fd, 10);
     if (ret < 0) {
         ret = ERR_SOCKET_LISTEN;
-        err = errno;
         goto out;
     }
 
