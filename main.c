@@ -17,7 +17,6 @@
 
 void my_tcp_message_handler(_client_slot *client, char *buffer, ssize_t len){
     buffer[len] = '\0';
-
     printf("%s:%u sent: %s", client->src_ip, client->src_port, buffer);
     send(client->client_fd, buffer, strlen(buffer), 0);
 }
