@@ -15,7 +15,6 @@ debug: echo-server
 release: CFLAGS += $(RELEASE)
 release: echo-server
 
-
 echo-server: tcp-server-epoll.c
 
 clean:

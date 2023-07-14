@@ -38,10 +38,14 @@ int main() {
   
   snprintf(si.bind_addr, sizeof(si.bind_addr), "%s", "0.0.0.0");
   si.bind_port = 1234;
-  si.tcp_message_handler = my_tcp_message_handler;
-  si.tcp_close_handler = NULL;    // &my_tcp_close_handler;
-  si.tcp_accept_handler = NULL;  //&my_tcp_accept_handler;
-  
+  si.tcp_message_handler = &my_tcp_message_handler;
+#ifdef DEBUG  
+  si.tcp_accept_handler =  &my_tcp_accept_handler;
+  si.tcp_close_handler  =  &my_tcp_close_handler;
+#else
+  si.tcp_accept_handler = NULL;
+  si.tcp_close_handler = NULL;
+#endif
   int ret = epoll_init_socket(&si);
   if (ret != 0) return ret;
   ret = epoll_event_loop(&si);
