@@ -30,7 +30,6 @@ static void handle_client_event( int client_fd, uint32_t revents, _socket_info *
 static int epoll_add(int epoll_fd, int fd, uint32_t events){
     struct epoll_event event;
     
-    /* Shut the valgrind up! */
     memset(&event, 0, sizeof(struct epoll_event));
 
     event.events  = events;

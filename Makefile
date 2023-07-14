@@ -1,8 +1,13 @@
-CFLAGS += -W -Wall -Wextra -Werror -Os -s -fstack-protector-all
+CFLAGS += -W -Wall -Wextra -Werror
+RELEASE = -Os -s -fstack-protector-all
+DEBUG = -ggdb -fsanitize=address -DDEBUG
 
-all: main
+all: echo-server
 
-main: tcp-server-epoll.c
+debug: CFLAGS += $(DEBUG)
+debug: echo-server
+
+echo-server: tcp-server-epoll.c
 
 clean:
-	$(RM) main
+	$(RM) echo-server

@@ -17,7 +17,9 @@
 
 void my_tcp_message_handler(_client_slot *client, char *buffer, ssize_t len){
     buffer[len] = '\0';
-    printf("%s:%u sent: %s", client->src_ip, client->src_port, buffer);
+#ifdef DEBUG
+    printf("%s:%u sent: %s\n", client->src_ip, client->src_port, buffer);
+#endif
     send(client->client_fd, buffer, strlen(buffer), 0);
 }
 
@@ -31,37 +33,18 @@ void my_tcp_close_handler(_client_slot *client){
 }
 
 
-int main(void)
-{
-    int ret;
-
-    _socket_info si;
-
-    snprintf(si.bind_addr, sizeof(si.bind_addr), "%s", "0.0.0.0");
-    si.bind_port = 1234;
-    si.tcp_message_handler = &my_tcp_message_handler;
-    si.tcp_close_handler = &my_tcp_close_handler;
-    si.tcp_accept_handler = &my_tcp_accept_handler;
-
-    ret = epoll_init_socket(&si);
-    if (ret != 0)
-        goto out;
-
-    ret = epoll_event_loop(&si);
-
-out:
-    /*
-     * You should write a cleaner here.
-     *
-     * Close all client file descriptors and release
-     * some resources you may have.
-     *
-     * You may also want to set interrupt handler
-     * before the epoll_event_loop.
-     *
-     * For example, if you get SIGINT or SIGTERM
-     * set `state->stop` to true, so that it exits
-     * gracefully.
-     */
-    return ret;
+int main() {
+  _socket_info si;
+  
+  snprintf(si.bind_addr, sizeof(si.bind_addr), "%s", "0.0.0.0");
+  si.bind_port = 1234;
+  si.tcp_message_handler = my_tcp_message_handler;
+  si.tcp_close_handler = NULL;    // &my_tcp_close_handler;
+  si.tcp_accept_handler = NULL;  //&my_tcp_accept_handler;
+  
+  int ret = epoll_init_socket(&si);
+  if (ret != 0) return ret;
+  ret = epoll_event_loop(&si);
+  
+  return ret;
 }
