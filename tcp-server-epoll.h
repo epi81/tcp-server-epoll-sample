@@ -13,6 +13,9 @@
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
 
+#define CLIENTS 50000
+#define MAP 60000
+
 typedef struct {
     bool                is_used;
     int                 client_fd;
@@ -26,15 +29,15 @@ typedef struct {
     int                 tcp_fd;
     int                 epoll_fd;
     uint16_t            client_c;
-    _client_slot        clients[10];
+    _client_slot        clients[CLIENTS];
 
     /*
      * Map the file descriptor to client_slot array index
-     * Note: We assume there is no file descriptor greater than 10000.
+     * Note: We assume there is no file descriptor greater than CLIENTS.
      *
      * You must adjust this in production.
      */
-    uint32_t            client_map[10000];
+    uint32_t            client_map[MAP];
 }_tcp_state;
 
 typedef void (*_tcp_message_handler)(_client_slot *client, char *buffer, ssize_t len);
